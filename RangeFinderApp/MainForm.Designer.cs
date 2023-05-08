@@ -1,6 +1,6 @@
 ﻿namespace RangeFinderApp
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -35,6 +35,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnGo = new System.Windows.Forms.Button();
+            this.chkStoreInDB = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtDBConn = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -103,18 +106,48 @@
             this.btnGo.UseVisualStyleBackColor = true;
             this.btnGo.Click += new System.EventHandler(this.btnGo_Click);
             // 
-            // Form1
+            // chkStoreInDB
+            // 
+            this.chkStoreInDB.AutoSize = true;
+            this.chkStoreInDB.Location = new System.Drawing.Point(64, 399);
+            this.chkStoreInDB.Name = "chkStoreInDB";
+            this.chkStoreInDB.Size = new System.Drawing.Size(161, 24);
+            this.chkStoreInDB.TabIndex = 7;
+            this.chkStoreInDB.Text = "Store in database";
+            this.chkStoreInDB.UseVisualStyleBackColor = true;
+            this.chkStoreInDB.CheckedChanged += new System.EventHandler(this.chkStoreInDB_CheckedChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(25, 459);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(183, 20);
+            this.label3.TabIndex = 9;
+            this.label3.Text = "DT database connection";
+            // 
+            // txtDBConn
+            // 
+            this.txtDBConn.Location = new System.Drawing.Point(27, 482);
+            this.txtDBConn.Name = "txtDBConn";
+            this.txtDBConn.Size = new System.Drawing.Size(601, 26);
+            this.txtDBConn.TabIndex = 8;
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 605);
+            this.ClientSize = new System.Drawing.Size(640, 531);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtDBConn);
+            this.Controls.Add(this.chkStoreInDB);
             this.Controls.Add(this.btnGo);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtMeasureInterval);
             this.Controls.Add(this.txtMaxRange);
             this.Controls.Add(this.groupBox1);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Submarine Range Finder";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
@@ -132,6 +165,9 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnGo;
+        private System.Windows.Forms.CheckBox chkStoreInDB;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtDBConn;
     }
 }
 
