@@ -38,6 +38,9 @@
             this.chkStoreInDB = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtDBConn = new System.Windows.Forms.TextBox();
+            this.btnStop = new System.Windows.Forms.Button();
+            this.txtData = new System.Windows.Forms.TextBox();
+            this.rtb = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -133,11 +136,39 @@
             this.txtDBConn.Size = new System.Drawing.Size(601, 26);
             this.txtDBConn.TabIndex = 8;
             // 
+            // btnStop
+            // 
+            this.btnStop.Location = new System.Drawing.Point(454, 346);
+            this.btnStop.Name = "btnStop";
+            this.btnStop.Size = new System.Drawing.Size(158, 60);
+            this.btnStop.TabIndex = 10;
+            this.btnStop.Text = "Stop";
+            this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // txtData
+            // 
+            this.txtData.Location = new System.Drawing.Point(276, 432);
+            this.txtData.Name = "txtData";
+            this.txtData.Size = new System.Drawing.Size(336, 26);
+            this.txtData.TabIndex = 11;
+            // 
+            // rtb
+            // 
+            this.rtb.Location = new System.Drawing.Point(29, 548);
+            this.rtb.Name = "rtb";
+            this.rtb.Size = new System.Drawing.Size(583, 634);
+            this.rtb.TabIndex = 12;
+            this.rtb.Text = "";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 531);
+            this.ClientSize = new System.Drawing.Size(640, 1216);
+            this.Controls.Add(this.rtb);
+            this.Controls.Add(this.txtData);
+            this.Controls.Add(this.btnStop);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtDBConn);
             this.Controls.Add(this.chkStoreInDB);
@@ -168,6 +199,9 @@
         private System.Windows.Forms.CheckBox chkStoreInDB;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtDBConn;
+        private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.TextBox txtData;
+        private System.Windows.Forms.RichTextBox rtb;
     }
 }
 
