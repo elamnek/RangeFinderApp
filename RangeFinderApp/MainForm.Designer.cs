@@ -31,15 +31,12 @@
             this.lblRange = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.txtMaxRange = new System.Windows.Forms.TextBox();
-            this.txtMeasureInterval = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.btnGo = new System.Windows.Forms.Button();
             this.chkStoreInDB = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtDBConn = new System.Windows.Forms.TextBox();
             this.btnStop = new System.Windows.Forms.Button();
-            this.txtData = new System.Windows.Forms.TextBox();
             this.rtb = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -67,19 +64,11 @@
             // 
             // txtMaxRange
             // 
-            this.txtMaxRange.Location = new System.Drawing.Point(276, 277);
+            this.txtMaxRange.Location = new System.Drawing.Point(257, 277);
             this.txtMaxRange.Name = "txtMaxRange";
-            this.txtMaxRange.Size = new System.Drawing.Size(100, 26);
+            this.txtMaxRange.Size = new System.Drawing.Size(46, 26);
             this.txtMaxRange.TabIndex = 2;
             this.txtMaxRange.Text = "10";
-            // 
-            // txtMeasureInterval
-            // 
-            this.txtMeasureInterval.Location = new System.Drawing.Point(276, 327);
-            this.txtMeasureInterval.Name = "txtMeasureInterval";
-            this.txtMeasureInterval.Size = new System.Drawing.Size(100, 26);
-            this.txtMeasureInterval.TabIndex = 3;
-            this.txtMeasureInterval.Text = "250";
             // 
             // label1
             // 
@@ -90,20 +79,11 @@
             this.label1.TabIndex = 4;
             this.label1.Text = "Maximum range to store (m)";
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(45, 330);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(216, 20);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Measurement frequency (ms)";
-            // 
             // btnGo
             // 
-            this.btnGo.Location = new System.Drawing.Point(454, 280);
+            this.btnGo.Location = new System.Drawing.Point(332, 277);
             this.btnGo.Name = "btnGo";
-            this.btnGo.Size = new System.Drawing.Size(158, 60);
+            this.btnGo.Size = new System.Drawing.Size(135, 60);
             this.btnGo.TabIndex = 6;
             this.btnGo.Text = "Measure!";
             this.btnGo.UseVisualStyleBackColor = true;
@@ -118,7 +98,6 @@
             this.chkStoreInDB.TabIndex = 7;
             this.chkStoreInDB.Text = "Store in database";
             this.chkStoreInDB.UseVisualStyleBackColor = true;
-            this.chkStoreInDB.CheckedChanged += new System.EventHandler(this.chkStoreInDB_CheckedChanged);
             // 
             // label3
             // 
@@ -138,20 +117,12 @@
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(454, 346);
+            this.btnStop.Location = new System.Drawing.Point(476, 277);
             this.btnStop.Name = "btnStop";
-            this.btnStop.Size = new System.Drawing.Size(158, 60);
+            this.btnStop.Size = new System.Drawing.Size(136, 60);
             this.btnStop.TabIndex = 10;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
-            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
-            // 
-            // txtData
-            // 
-            this.txtData.Location = new System.Drawing.Point(276, 432);
-            this.txtData.Name = "txtData";
-            this.txtData.Size = new System.Drawing.Size(336, 26);
-            this.txtData.TabIndex = 11;
             // 
             // rtb
             // 
@@ -167,15 +138,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(640, 1216);
             this.Controls.Add(this.rtb);
-            this.Controls.Add(this.txtData);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtDBConn);
             this.Controls.Add(this.chkStoreInDB);
             this.Controls.Add(this.btnGo);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtMeasureInterval);
             this.Controls.Add(this.txtMaxRange);
             this.Controls.Add(this.groupBox1);
             this.Name = "MainForm";
@@ -192,15 +160,12 @@
         private System.Windows.Forms.Label lblRange;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox txtMaxRange;
-        private System.Windows.Forms.TextBox txtMeasureInterval;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnGo;
         private System.Windows.Forms.CheckBox chkStoreInDB;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtDBConn;
         private System.Windows.Forms.Button btnStop;
-        private System.Windows.Forms.TextBox txtData;
         private System.Windows.Forms.RichTextBox rtb;
     }
 }
