@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Npgsql;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace RangeFinderApp
 {
@@ -21,17 +22,46 @@ namespace RangeFinderApp
         }
 
         //create the serial connection
-        private SerialPort sp_1 = new SerialPort("COM7", 9600, Parity.None, 8, StopBits.One);
+        private SerialPort sp_1;
+        private NpgsqlConnection m_connPG = null;
 
         private Boolean blnMeasuring = false;
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                txtPort.Text = Properties.Settings.Default.Port;
+                txtDBConn.Text = Properties.Settings.Default.DBConn;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                Properties.Settings.Default.Port = txtPort.Text;
+                Properties.Settings.Default.DBConn = txtDBConn.Text;
+                Properties.Settings.Default.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
 
         private void btnGo_Click(object sender, EventArgs e)
         {
             try
             {
 
-                blnMeasuring = true;
+                sp_1 = new SerialPort(txtPort.Text, 9600, Parity.None, 8, StopBits.One);
 
+                blnMeasuring = true;
 
                 if (!sp_1.IsOpen) {
 
@@ -43,9 +73,19 @@ namespace RangeFinderApp
                     
                     byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
                     sp_1.Write(buffer, 0, 4);
-
-                   
+  
                 }
+
+
+                //postgres connection
+                if (txtDBConn.Text.Length > 0)
+                {     
+                    //open database
+                    m_connPG = new NpgsqlConnection(txtDBConn.Text);
+                    m_connPG.Open();
+                }
+
+               
             }
             catch (Exception ex)
             {
@@ -76,153 +116,28 @@ namespace RangeFinderApp
 
                 if (!blnMeasuring) { return; }
 
+                //get the data from the serial port and extract the distance from it
                 SerialPort sp = (SerialPort)sender;
-                string indata = sp.ReadExisting();
-                string[] parts = indata.Split('?'); //? -? 000.442 ?
+                string strData = sp.ReadExisting();
+                string[] parts = strData.Split('?'); //? -? 000.442 ?
                 string strDist = parts[2].Trim();
                 SetRTBText(rtb, strDist);
-                if (double.TryParse(strDist, out double val))
+                if (double.TryParse(strDist, out double dblDist))
                 {
-                    SetControlText(lblRange,val.ToString());
-                }
+                    SetControlText(lblRange, dblDist.ToString());
 
+                    string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
 
-                
-
-                
-
-                   //do the insert into the postgres realtime table here
-                /    RealtimeInsertIntoDT(strReceived, 3, m_listRealtimeDataTableColDefs);
-                //}
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-        private void RealtimeInsertIntoDT(string strReceived, int intDataChannel, ArrayList listColDefs)
-        {
-            try
-            {
-
-                if (listColDefs == null)
-                {
-                    return;
-                }
-
-                //read a line and split it up
-                String strLine = strReceived.Trim().TrimStart('{').TrimEnd('}');
-                String[] arrayLine = strLine.Split(new char[] { ',' }, StringSplitOptions.None);
-
-                //get a hash of all data values
-                string strTime = "";
-                Hashtable hashInsertData = new Hashtable();
-                foreach (string strDataValue in arrayLine)
-                {
-
-                    String[] arrayParts = strDataValue.Split(new char[] { '|' }, StringSplitOptions.None);
-                    if (arrayParts.Length == 2)
+                    if (double.TryParse(txtMaxRange.Text,out double dblMaxRange))
                     {
-                        string strMetaID = arrayParts[0].Trim();
-                        string strValue = arrayParts[1].Trim();
-                        int intMetaID = int.Parse(strMetaID);
-
-                        if (intMetaID == 13)
+                        if (dblDist <= dblMaxRange)
                         {
-                            int intMillis = -1;
-                            if (strValue.Contains("#"))
-                            {
-                                //this is a sub second time with millis at the start - split this off
-                                string[] arrayTime = strValue.Split(new char[] { '#' }, StringSplitOptions.None);
-                                intMillis = int.Parse(arrayTime[0]);
-                                strValue = arrayTime[1].Trim();
-                            }
-
-
-                            DateTime dteThis = DateTime.ParseExact(strValue, "H:m:s d/M/yyyy", null); //16:56:13 5/2/2023
-
-                            //datetimes need to be inserted in the local timezone
-                            //the postgres timestamptz field type is time zone aware and assumes any insert datetime is local
-                            //it will store the actual datetime as utc, but whenever it is queried using sql the local time will be returned
-                            //the postgres database timezone is stored against the postgres server properties and this is used to define
-                            //what timezone the data is displayed in
-                            strTime = "'" + dteThis.ToString("yyyy-MM-dd HH:mm:ss") + "'";
-                        }
-                        else
-                        {
-                            if (!hashInsertData.ContainsKey(intMetaID)) { hashInsertData.Add(intMetaID, strValue); }
+                            //do the insert into the postgres realtime table here
+                            RealtimeInsertIntoDT(strTime, dblDist);
                         }
                     }
-                }
 
-
-                if (strTime.Length > 0)
-                {
-                    ArrayList listSQLInserts = new ArrayList();
-
-                    //this is a destination table
-                    string strColumns = "time,data_channel";
-                    string strValues = strTime + "," + intDataChannel.ToString();
-
-                    //go through columns and build sql 
-                    foreach (Hashtable hashColDef in listColDefs)
-                    {
-                        int intThisMetaID = (int)hashColDef["METADATAID"];
-                        if (hashInsertData.ContainsKey(intThisMetaID))
-                        {
-                            //the log record contains this metadata id
-
-                            string strValue = hashInsertData[intThisMetaID].ToString();
-                            string strColName = hashColDef["DESTCOL"].ToString();
-                            string strType = hashColDef["DESTCOLTYPE"].ToString();
-
-                            if (strType == "str")
-                            {
-                                if (strValue.Length > 0)
-                                {
-                                    strValue = "'" + strValue + "'";
-                                }
-                            }
-                            else if (strType == "int")
-                            {
-                                int intValue;
-                                if (int.TryParse(strValue, out intValue))
-                                {
-                                    strValue = intValue.ToString();
-                                }
-                                else { strValue = ""; }
-                            }
-                            else if (strType == "dbl")
-                            {
-                                double dblValue;
-                                if (double.TryParse(strValue, out dblValue))
-                                {
-                                    strValue = dblValue.ToString();
-                                }
-                                else { strValue = ""; }
-                            }
-
-                            if (strValue.Length > 0)
-                            {
-
-                                strColumns = strColumns + "," + strColName;
-                                strValues = strValues + "," + strValue;
-                            }
-                        }
-
-                    }
-
-                    if (strColumns != "time")
-                    {
-                        //build sql insert for this table
-                        listSQLInserts.Add("insert into dt_ts_realtime_data (" + strColumns + ")" + " values (" + strValues + ") ON CONFLICT DO NOTHING");
-                    }
-
-
-                    //do the inserts for this record (time point)
-                    PGInsert(listSQLInserts);
-
+                   
                 }
 
             }
@@ -231,25 +146,31 @@ namespace RangeFinderApp
                 MessageBox.Show(ex.ToString());
             }
         }
-        private void PGInsert(ArrayList listSQLInserts)
+        private void RealtimeInsertIntoDT(string strTime, double dblDist)
         {
             try
             {
-                foreach (string strSQL in listSQLInserts)
-                {
-                    NpgsqlCommand commPG = new NpgsqlCommand(strSQL, m_connPG);
-                    commPG.ExecuteNonQuery();
-                    commPG.Dispose();
-                }
+
+                if (m_connPG == null) { return; }
+
+                string strSQL = "insert into dt_ts_realtime_data (time,data_channel,range_m)" + " values (" + strTime + ",3,"+ dblDist.ToString() + ") ON CONFLICT DO NOTHING";
+
+                NpgsqlCommand commPG = new NpgsqlCommand(strSQL, m_connPG);
+                commPG.ExecuteNonQuery();
+                commPG.Dispose();
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void btnStop_Click(object sender, EventArgs e)
+        {
+            blnMeasuring = false;
         }
     }
-
 }
 
 

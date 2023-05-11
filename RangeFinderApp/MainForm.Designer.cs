@@ -38,6 +38,8 @@
             this.txtDBConn = new System.Windows.Forms.TextBox();
             this.btnStop = new System.Windows.Forms.Button();
             this.rtb = new System.Windows.Forms.RichTextBox();
+            this.txtPort = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,7 +66,7 @@
             // 
             // txtMaxRange
             // 
-            this.txtMaxRange.Location = new System.Drawing.Point(257, 277);
+            this.txtMaxRange.Location = new System.Drawing.Point(256, 311);
             this.txtMaxRange.Name = "txtMaxRange";
             this.txtMaxRange.Size = new System.Drawing.Size(46, 26);
             this.txtMaxRange.TabIndex = 2;
@@ -73,7 +75,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 280);
+            this.label1.Location = new System.Drawing.Point(45, 314);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(206, 20);
             this.label1.TabIndex = 4;
@@ -92,7 +94,7 @@
             // chkStoreInDB
             // 
             this.chkStoreInDB.AutoSize = true;
-            this.chkStoreInDB.Location = new System.Drawing.Point(64, 399);
+            this.chkStoreInDB.Location = new System.Drawing.Point(64, 398);
             this.chkStoreInDB.Name = "chkStoreInDB";
             this.chkStoreInDB.Size = new System.Drawing.Size(161, 24);
             this.chkStoreInDB.TabIndex = 7;
@@ -102,7 +104,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(25, 459);
+            this.label3.Location = new System.Drawing.Point(26, 458);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(183, 20);
             this.label3.TabIndex = 9;
@@ -112,7 +114,7 @@
             // 
             this.txtDBConn.Location = new System.Drawing.Point(27, 482);
             this.txtDBConn.Name = "txtDBConn";
-            this.txtDBConn.Size = new System.Drawing.Size(601, 26);
+            this.txtDBConn.Size = new System.Drawing.Size(585, 26);
             this.txtDBConn.TabIndex = 8;
             // 
             // btnStop
@@ -123,20 +125,40 @@
             this.btnStop.TabIndex = 10;
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
+            this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
             // rtb
             // 
-            this.rtb.Location = new System.Drawing.Point(29, 548);
+            this.rtb.Location = new System.Drawing.Point(28, 548);
             this.rtb.Name = "rtb";
-            this.rtb.Size = new System.Drawing.Size(583, 634);
+            this.rtb.Size = new System.Drawing.Size(583, 635);
             this.rtb.TabIndex = 12;
             this.rtb.Text = "";
+            // 
+            // txtPort
+            // 
+            this.txtPort.Location = new System.Drawing.Point(75, 258);
+            this.txtPort.Name = "txtPort";
+            this.txtPort.Size = new System.Drawing.Size(88, 26);
+            this.txtPort.TabIndex = 13;
+            this.txtPort.Text = "COM6";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(31, 261);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(38, 20);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "Port";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 1216);
+            this.ClientSize = new System.Drawing.Size(640, 1062);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtPort);
             this.Controls.Add(this.rtb);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.label3);
@@ -148,6 +170,8 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "MainForm";
             this.Text = "Submarine Range Finder";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -167,6 +191,8 @@
         private System.Windows.Forms.TextBox txtDBConn;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.RichTextBox rtb;
+        private System.Windows.Forms.TextBox txtPort;
+        private System.Windows.Forms.Label label2;
     }
 }
 
