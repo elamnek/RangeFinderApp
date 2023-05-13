@@ -69,11 +69,47 @@ namespace RangeFinderApp
                     //sp_1.ErrorReceived += new SerialErrorReceivedEventHandler(sp_1_ErrorReceived);
 
                     sp_1.Open();
+
+                    ////revise distance +1
+                    //byte[] buffer7 = { 0xFA, 0x04, 0x06, 0x2B, 0x01, 0xD0 };
+                    //sp_1.Write(buffer7, 0, 6);
+                    //System.Threading.Thread.Sleep(100);
+
+                    //revise distance -1
+                    //byte[] buffer6 = { 0xFA, 0x04, 0x06, 0x2D, 0x01, 0xCE };
+                    //sp_1.Write(buffer6, 0, 6);
+                    //System.Threading.Thread.Sleep(100);
+
+                    ////time interval
+                    //byte[] buffer5 = { 0xFA, 0x04, 0x05, 0x09, 0xF4 };
+                    //sp_1.Write(buffer5, 0, 5);
+                    //System.Threading.Thread.Sleep(100);
+
+                    ////30m range
+                    //byte[] buffer4 = { 0xFA, 0x04, 0x09, 0x1E, 0xDB };
+                    //sp_1.Write(buffer4, 0, 5);
+                    //System.Threading.Thread.Sleep(100);
+
+                    ////1mm resolution
+                    //byte[] buffer2 = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };
+                    //sp_1.Write(buffer2, 0, 5);
+                    //System.Threading.Thread.Sleep(100);
+
+                    ////freq = 20
+                    //byte[] buffer3 = { 0xFA, 0x04, 0x0A, 0x14, 0xE4 };
+                    //sp_1.Write(buffer3, 0, 5);
+                    //System.Threading.Thread.Sleep(100);
+
+                    ////continuous readings
+                    //byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
+                    //sp_1.Write(buffer, 0, 4);
+                    //System.Threading.Thread.Sleep(100);
+
                     
-                    
-                    byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
-                    sp_1.Write(buffer, 0, 4);
-  
+
+
+
+
                 }
 
 
@@ -85,7 +121,28 @@ namespace RangeFinderApp
                     m_connPG.Open();
                 }
 
-               
+                ////single readings
+                //byte[] buffer = { 0x80, 0x06, 0x02, 0x78 };
+                //sp_1.Write(buffer, 0, 4);
+                //System.Threading.Thread.Sleep(100);
+
+                //single measurment broadcast and then read cache
+                byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
+                sp_1.Write(buffer, 0, 4);
+                byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
+                sp_1.Write(buffer2, 0, 4);
+
+
+
+
+                
+
+
+
+
+
+
+
             }
             catch (Exception ex)
             {
@@ -128,7 +185,7 @@ namespace RangeFinderApp
 
                     string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
 
-                    if (double.TryParse(txtMaxRange.Text,out double dblMaxRange))
+                    if (double.TryParse(txtMaxRange.Text, out double dblMaxRange))
                     {
                         if (dblDist <= dblMaxRange)
                         {
@@ -137,8 +194,12 @@ namespace RangeFinderApp
                         }
                     }
 
-                   
                 }
+
+                byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
+                sp_1.Write(buffer, 0, 4);
+                byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
+                sp_1.Write(buffer2, 0, 4);
 
             }
             catch (Exception ex)
@@ -168,7 +229,58 @@ namespace RangeFinderApp
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            if (sp_1.IsOpen)
+            {
+                byte[] buffer = { 0x80, 0x04, 0x02, 0x7A };
+                sp_1.Write(buffer, 0, 4);
+            }
+               
             blnMeasuring = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                byte[] buffer = { 0xFA, 0x04, 0x05, 0x09};
+
+
+                int CSsum = 0;
+
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    CSsum += buffer[i];
+                }
+
+                int CS = (~CSsum) + 1;
+                MessageBox.Show(CS.ToString("X2"));
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+
+                //continuous readings
+                byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
+                sp_1.Write(buffer, 0, 4);
+                System.Threading.Thread.Sleep(100);
+
+
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
     }
 }
