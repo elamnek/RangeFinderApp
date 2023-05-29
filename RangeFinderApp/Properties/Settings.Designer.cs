@@ -46,5 +46,41 @@ namespace RangeFinderApp.Properties {
                 this["DBConn"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SampleRate {
+            get {
+                return ((string)(this["SampleRate"]));
+            }
+            set {
+                this["SampleRate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MinRange {
+            get {
+                return ((string)(this["MinRange"]));
+            }
+            set {
+                this["MinRange"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MaxRange {
+            get {
+                return ((string)(this["MaxRange"]));
+            }
+            set {
+                this["MaxRange"] = value;
+            }
+        }
     }
 }

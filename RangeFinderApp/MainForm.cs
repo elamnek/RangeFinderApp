@@ -37,6 +37,10 @@ namespace RangeFinderApp
             {
                 txtPort.Text = Properties.Settings.Default.Port;
                 txtDBConn.Text = Properties.Settings.Default.DBConn;
+                txtSampleRate.Text = Properties.Settings.Default.SampleRate;
+                txtMinRange.Text = Properties.Settings.Default.MinRange;
+                txtMaxRange.Text = Properties.Settings.Default.MaxRange;
+
             }
             catch (Exception ex)
             {
@@ -50,6 +54,9 @@ namespace RangeFinderApp
             {
                 Properties.Settings.Default.Port = txtPort.Text;
                 Properties.Settings.Default.DBConn = txtDBConn.Text;
+                Properties.Settings.Default.SampleRate = txtSampleRate.Text;
+                Properties.Settings.Default.MinRange = txtMinRange.Text;
+                Properties.Settings.Default.MaxRange = txtMaxRange.Text;
                 Properties.Settings.Default.Save();
             }
             catch (Exception ex)
@@ -155,21 +162,36 @@ namespace RangeFinderApp
                 TimeSpan ts = dteNow.Subtract(m_dteStart);
 
                 double dblSampleRate = double.Parse(txtSampleRate.Text);
-
-                if (ts.Milliseconds > dblSampleRate)
+                double dblMinRange = double.Parse(txtMinRange.Text);
+                double dblMaxRange = double.Parse(txtMaxRange.Text);
+                  
+                SerialPort sp = (SerialPort)sender;
+                string strData = sp.ReadExisting();
+                
+                double dblReading;
+                if (double.TryParse(strData, out dblReading))
                 {
-                    //get the data from the serial port and extract the distance from it
-                    SerialPort sp = (SerialPort)sender;
-                    string strData = sp.ReadExisting();
-                    SetControlText(lblRange, strData);
 
-                    sp.DiscardOutBuffer();
+                    if (dblReading >= (dblMinRange*1000) && dblReading <= (dblMaxRange*1000))
+                    {
 
-                    m_dteStart = DateTime.Now;
+                        SetControlText(lblRange, strData);
+
+                        if (ts.Milliseconds > dblSampleRate)
+                        {
+
+                            //do the insert into the postgres realtime table here
+                            string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
+                            RealtimeInsertIntoDT(strTime, dblReading);
+
+
+                            m_dteStart = DateTime.Now;
+                        }
+                    }
                 }
+                sp.DiscardOutBuffer();
+                
 
-                
-                
                 //string[] parts = strData.Split('?'); //? -? 000.442 ?
                 //string strDist = parts[2].Trim();
                 //SetRTBText(rtb, strDist);
@@ -227,8 +249,12 @@ namespace RangeFinderApp
         {
             if (sp_1.IsOpen)
             {
-                byte[] buffer = { 0x80, 0x04, 0x02, 0x7A };
-                sp_1.Write(buffer, 0, 4);
+                sp_1.Close();
+            }
+
+            if (m_connPG.State == ConnectionState.Open)
+            {
+                m_connPG.Close();
             }
                
             blnMeasuring = false;

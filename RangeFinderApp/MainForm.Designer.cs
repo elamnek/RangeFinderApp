@@ -33,15 +33,12 @@
             this.txtMaxRange = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnGo = new System.Windows.Forms.Button();
-            this.chkStoreInDB = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtDBConn = new System.Windows.Forms.TextBox();
             this.btnStop = new System.Windows.Forms.Button();
             this.rtb = new System.Windows.Forms.RichTextBox();
             this.txtPort = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.txtSampleRate = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -98,16 +95,6 @@
             this.btnGo.UseVisualStyleBackColor = true;
             this.btnGo.Click += new System.EventHandler(this.btnGo_Click);
             // 
-            // chkStoreInDB
-            // 
-            this.chkStoreInDB.AutoSize = true;
-            this.chkStoreInDB.Location = new System.Drawing.Point(151, 410);
-            this.chkStoreInDB.Name = "chkStoreInDB";
-            this.chkStoreInDB.Size = new System.Drawing.Size(161, 24);
-            this.chkStoreInDB.TabIndex = 7;
-            this.chkStoreInDB.Text = "Store in database";
-            this.chkStoreInDB.UseVisualStyleBackColor = true;
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -136,9 +123,9 @@
             // 
             // rtb
             // 
-            this.rtb.Location = new System.Drawing.Point(28, 548);
+            this.rtb.Location = new System.Drawing.Point(27, 523);
             this.rtb.Name = "rtb";
-            this.rtb.Size = new System.Drawing.Size(583, 635);
+            this.rtb.Size = new System.Drawing.Size(583, 111);
             this.rtb.TabIndex = 12;
             this.rtb.Text = "";
             // 
@@ -158,26 +145,6 @@
             this.label2.Size = new System.Drawing.Size(38, 20);
             this.label2.TabIndex = 14;
             this.label2.Text = "Port";
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(495, 346);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(116, 40);
-            this.button1.TabIndex = 15;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(414, 346);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 16;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // label4
             // 
@@ -219,20 +186,17 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 1062);
+            this.ClientSize = new System.Drawing.Size(640, 646);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.txtMinRange);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtSampleRate);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtPort);
             this.Controls.Add(this.rtb);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtDBConn);
-            this.Controls.Add(this.chkStoreInDB);
             this.Controls.Add(this.btnGo);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtMaxRange);
@@ -255,15 +219,12 @@
         private System.Windows.Forms.TextBox txtMaxRange;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnGo;
-        private System.Windows.Forms.CheckBox chkStoreInDB;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtDBConn;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.RichTextBox rtb;
         private System.Windows.Forms.TextBox txtPort;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtSampleRate;
         private System.Windows.Forms.Label label5;
