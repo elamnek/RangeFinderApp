@@ -27,6 +27,10 @@ namespace RangeFinderApp
 
         private Boolean blnMeasuring = false;
 
+        private DateTime m_dteStart;
+
+        
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             try
@@ -59,7 +63,7 @@ namespace RangeFinderApp
             try
             {
 
-                sp_1 = new SerialPort(txtPort.Text, 9600, Parity.None, 8, StopBits.One);
+                sp_1 = new SerialPort(txtPort.Text, 115200, Parity.None, 8, StopBits.One);
 
                 blnMeasuring = true;
 
@@ -70,32 +74,33 @@ namespace RangeFinderApp
 
                     sp_1.Open();
 
-                    ////revise distance +1
-                    //byte[] buffer7 = { 0xFA, 0x04, 0x06, 0x2B, 0x01, 0xD0 };
-                    //sp_1.Write(buffer7, 0, 6);
-                    //System.Threading.Thread.Sleep(100);
+                    //tell the unit to send text rather than binary
+                    byte[] buffer7 = { 0x00, 0x11, 0x01, 0x45};
+                    sp_1.Write(buffer7, 0, 4);
 
-                    //revise distance -1
+                    m_dteStart = DateTime.Now;
+
+                    ////revise distance -1
                     //byte[] buffer6 = { 0xFA, 0x04, 0x06, 0x2D, 0x01, 0xCE };
                     //sp_1.Write(buffer6, 0, 6);
                     //System.Threading.Thread.Sleep(100);
 
-                    ////time interval
-                    //byte[] buffer5 = { 0xFA, 0x04, 0x05, 0x09, 0xF4 };
+                    //////time interval
+                    //byte[] buffer5 = { 0xFA, 0x04, 0x05, 0x14, 0xE9 };
                     //sp_1.Write(buffer5, 0, 5);
                     //System.Threading.Thread.Sleep(100);
 
-                    ////30m range
-                    //byte[] buffer4 = { 0xFA, 0x04, 0x09, 0x1E, 0xDB };
+                    //////10m range
+                    //byte[] buffer4 = { 0xFA, 0x04, 0x09, 0x0A, 0xEF };
                     //sp_1.Write(buffer4, 0, 5);
                     //System.Threading.Thread.Sleep(100);
 
-                    ////1mm resolution
-                    //byte[] buffer2 = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };
-                    //sp_1.Write(buffer2, 0, 5);
+                    //////1mm resolution
+                    //byte[] buffer55 = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };
+                    //sp_1.Write(buffer55, 0, 5);
                     //System.Threading.Thread.Sleep(100);
 
-                    ////freq = 20
+                    //////freq = 20
                     //byte[] buffer3 = { 0xFA, 0x04, 0x0A, 0x14, 0xE4 };
                     //sp_1.Write(buffer3, 0, 5);
                     //System.Threading.Thread.Sleep(100);
@@ -104,11 +109,6 @@ namespace RangeFinderApp
                     //byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
                     //sp_1.Write(buffer, 0, 4);
                     //System.Threading.Thread.Sleep(100);
-
-                    
-
-
-
 
                 }
 
@@ -121,28 +121,6 @@ namespace RangeFinderApp
                     m_connPG.Open();
                 }
 
-                ////single readings
-                //byte[] buffer = { 0x80, 0x06, 0x02, 0x78 };
-                //sp_1.Write(buffer, 0, 4);
-                //System.Threading.Thread.Sleep(100);
-
-                //single measurment broadcast and then read cache
-                byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
-                sp_1.Write(buffer, 0, 4);
-                byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
-                sp_1.Write(buffer2, 0, 4);
-
-
-
-
-                
-
-
-
-
-
-
-
             }
             catch (Exception ex)
             {
@@ -153,7 +131,6 @@ namespace RangeFinderApp
         }
 
         
-
         public static void SetControlText(Control ctl, string text)
         {
             ctl.Invoke((MethodInvoker)delegate { ctl.Text = text; });
@@ -173,33 +150,52 @@ namespace RangeFinderApp
 
                 if (!blnMeasuring) { return; }
 
-                //get the data from the serial port and extract the distance from it
-                SerialPort sp = (SerialPort)sender;
-                string strData = sp.ReadExisting();
-                string[] parts = strData.Split('?'); //? -? 000.442 ?
-                string strDist = parts[2].Trim();
-                SetRTBText(rtb, strDist);
-                if (double.TryParse(strDist, out double dblDist))
+
+                DateTime dteNow = DateTime.Now;
+                TimeSpan ts = dteNow.Subtract(m_dteStart);
+
+                double dblSampleRate = double.Parse(txtSampleRate.Text);
+
+                if (ts.Milliseconds > dblSampleRate)
                 {
-                    SetControlText(lblRange, dblDist.ToString());
+                    //get the data from the serial port and extract the distance from it
+                    SerialPort sp = (SerialPort)sender;
+                    string strData = sp.ReadExisting();
+                    SetControlText(lblRange, strData);
 
-                    string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
+                    sp.DiscardOutBuffer();
 
-                    if (double.TryParse(txtMaxRange.Text, out double dblMaxRange))
-                    {
-                        if (dblDist <= dblMaxRange)
-                        {
-                            //do the insert into the postgres realtime table here
-                            RealtimeInsertIntoDT(strTime, dblDist);
-                        }
-                    }
-
+                    m_dteStart = DateTime.Now;
                 }
 
-                byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
-                sp_1.Write(buffer, 0, 4);
-                byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
-                sp_1.Write(buffer2, 0, 4);
+                
+                
+                //string[] parts = strData.Split('?'); //? -? 000.442 ?
+                //string strDist = parts[2].Trim();
+                //SetRTBText(rtb, strDist);
+                //if (double.TryParse(strDist, out double dblDist))
+                //{
+                //    SetControlText(lblRange, dblDist.ToString());
+
+                //    string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
+
+                //    if (double.TryParse(txtMaxRange.Text, out double dblMaxRange))
+                //    {
+                //        if (dblDist <= dblMaxRange)
+                //        {
+                //            //do the insert into the postgres realtime table here
+                //            RealtimeInsertIntoDT(strTime, dblDist);
+                //        }
+                //    }
+
+                //}
+
+                //System.Threading.Thread.Sleep(100);
+                //byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
+                //sp_1.Write(buffer, 0, 4);
+                //byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
+                //sp_1.Write(buffer2, 0, 4);
+
 
             }
             catch (Exception ex)
@@ -243,7 +239,7 @@ namespace RangeFinderApp
             try
             {
 
-                byte[] buffer = { 0xFA, 0x04, 0x05, 0x09};
+                byte[] buffer = { 0xFA, 0x04, 0x05, 0x14 };
 
 
                 int CSsum = 0;
@@ -270,7 +266,7 @@ namespace RangeFinderApp
 
 
                 //continuous readings
-                byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
+                byte[] buffer = { 0xFA, 0x04, 0x05, 0x01 };
                 sp_1.Write(buffer, 0, 4);
                 System.Threading.Thread.Sleep(100);
 

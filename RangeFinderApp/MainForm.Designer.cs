@@ -42,6 +42,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtSampleRate = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtMinRange = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -68,16 +72,17 @@
             // 
             // txtMaxRange
             // 
-            this.txtMaxRange.Location = new System.Drawing.Point(256, 311);
+            this.txtMaxRange.Location = new System.Drawing.Point(266, 328);
             this.txtMaxRange.Name = "txtMaxRange";
             this.txtMaxRange.Size = new System.Drawing.Size(46, 26);
             this.txtMaxRange.TabIndex = 2;
-            this.txtMaxRange.Text = "10";
+            this.txtMaxRange.Text = "3";
+            this.txtMaxRange.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 314);
+            this.label1.Location = new System.Drawing.Point(51, 331);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(206, 20);
             this.label1.TabIndex = 4;
@@ -96,7 +101,7 @@
             // chkStoreInDB
             // 
             this.chkStoreInDB.AutoSize = true;
-            this.chkStoreInDB.Location = new System.Drawing.Point(64, 398);
+            this.chkStoreInDB.Location = new System.Drawing.Point(151, 410);
             this.chkStoreInDB.Name = "chkStoreInDB";
             this.chkStoreInDB.Size = new System.Drawing.Size(161, 24);
             this.chkStoreInDB.TabIndex = 7;
@@ -106,7 +111,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 458);
+            this.label3.Location = new System.Drawing.Point(25, 459);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(183, 20);
             this.label3.TabIndex = 9;
@@ -114,9 +119,9 @@
             // 
             // txtDBConn
             // 
-            this.txtDBConn.Location = new System.Drawing.Point(27, 482);
+            this.txtDBConn.Location = new System.Drawing.Point(28, 482);
             this.txtDBConn.Name = "txtDBConn";
-            this.txtDBConn.Size = new System.Drawing.Size(585, 26);
+            this.txtDBConn.Size = new System.Drawing.Size(584, 26);
             this.txtDBConn.TabIndex = 8;
             // 
             // btnStop
@@ -139,16 +144,16 @@
             // 
             // txtPort
             // 
-            this.txtPort.Location = new System.Drawing.Point(75, 258);
+            this.txtPort.Location = new System.Drawing.Point(224, 264);
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(88, 26);
             this.txtPort.TabIndex = 13;
-            this.txtPort.Text = "COM6";
+            this.txtPort.Text = "COM16";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(31, 261);
+            this.label2.Location = new System.Drawing.Point(180, 267);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 20);
             this.label2.TabIndex = 14;
@@ -156,7 +161,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(373, 398);
+            this.button1.Location = new System.Drawing.Point(495, 346);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(116, 40);
             this.button1.TabIndex = 15;
@@ -166,7 +171,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(513, 414);
+            this.button2.Location = new System.Drawing.Point(414, 346);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 16;
@@ -174,11 +179,51 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(130, 299);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(130, 20);
+            this.label4.TabIndex = 18;
+            this.label4.Text = "Sample rate (ms)";
+            // 
+            // txtSampleRate
+            // 
+            this.txtSampleRate.Location = new System.Drawing.Point(266, 296);
+            this.txtSampleRate.Name = "txtSampleRate";
+            this.txtSampleRate.Size = new System.Drawing.Size(46, 26);
+            this.txtSampleRate.TabIndex = 17;
+            this.txtSampleRate.Text = "100";
+            this.txtSampleRate.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(51, 362);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(202, 20);
+            this.label5.TabIndex = 20;
+            this.label5.Text = "Minimum range to store (m)";
+            // 
+            // txtMinRange
+            // 
+            this.txtMinRange.Location = new System.Drawing.Point(266, 359);
+            this.txtMinRange.Name = "txtMinRange";
+            this.txtMinRange.Size = new System.Drawing.Size(46, 26);
+            this.txtMinRange.TabIndex = 19;
+            this.txtMinRange.Text = "0.5";
+            this.txtMinRange.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(640, 1062);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.txtMinRange);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.txtSampleRate);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);
@@ -219,6 +264,10 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtSampleRate;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtMinRange;
     }
 }
 
