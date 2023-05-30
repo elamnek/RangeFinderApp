@@ -82,5 +82,17 @@ namespace RangeFinderApp.Properties {
                 this["MaxRange"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MaxSeparation {
+            get {
+                return ((string)(this["MaxSeparation"]));
+            }
+            set {
+                this["MaxSeparation"] = value;
+            }
+        }
     }
 }

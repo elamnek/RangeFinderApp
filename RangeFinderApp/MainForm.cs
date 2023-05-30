@@ -29,6 +29,11 @@ namespace RangeFinderApp
 
         private DateTime m_dteStart;
 
+        private DateTime m_dtePrevious;
+        private double m_dblReadingPrevious;
+        private double m_dblReadingPrevious2;
+        private double m_dblVelocityPrevious;
+
         
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -40,6 +45,7 @@ namespace RangeFinderApp
                 txtSampleRate.Text = Properties.Settings.Default.SampleRate;
                 txtMinRange.Text = Properties.Settings.Default.MinRange;
                 txtMaxRange.Text = Properties.Settings.Default.MaxRange;
+                txtMaxSeparation.Text = Properties.Settings.Default.MaxSeparation;
 
             }
             catch (Exception ex)
@@ -57,7 +63,26 @@ namespace RangeFinderApp
                 Properties.Settings.Default.SampleRate = txtSampleRate.Text;
                 Properties.Settings.Default.MinRange = txtMinRange.Text;
                 Properties.Settings.Default.MaxRange = txtMaxRange.Text;
+                Properties.Settings.Default.MaxSeparation = txtMaxSeparation.Text;
                 Properties.Settings.Default.Save();
+
+                if (sp_1 != null)
+                {
+                    if (sp_1.IsOpen)
+                    {
+                        sp_1.Close();
+                    }
+                }
+
+                if (m_connPG != null)
+                {
+                    if (m_connPG.State == ConnectionState.Open)
+                    {
+                        m_connPG.Close();
+                    }
+                }
+                
+
             }
             catch (Exception ex)
             {
@@ -79,45 +104,18 @@ namespace RangeFinderApp
                     sp_1.DataReceived += new SerialDataReceivedEventHandler(sp_1_DataReceived);
                     //sp_1.ErrorReceived += new SerialErrorReceivedEventHandler(sp_1_ErrorReceived);
 
-                    sp_1.Open();
-
-                    //tell the unit to send text rather than binary
-                    byte[] buffer7 = { 0x00, 0x11, 0x01, 0x45};
-                    sp_1.Write(buffer7, 0, 4);
-
-                    m_dteStart = DateTime.Now;
-
-                    ////revise distance -1
-                    //byte[] buffer6 = { 0xFA, 0x04, 0x06, 0x2D, 0x01, 0xCE };
-                    //sp_1.Write(buffer6, 0, 6);
-                    //System.Threading.Thread.Sleep(100);
-
-                    //////time interval
-                    //byte[] buffer5 = { 0xFA, 0x04, 0x05, 0x14, 0xE9 };
-                    //sp_1.Write(buffer5, 0, 5);
-                    //System.Threading.Thread.Sleep(100);
-
-                    //////10m range
-                    //byte[] buffer4 = { 0xFA, 0x04, 0x09, 0x0A, 0xEF };
-                    //sp_1.Write(buffer4, 0, 5);
-                    //System.Threading.Thread.Sleep(100);
-
-                    //////1mm resolution
-                    //byte[] buffer55 = { 0xFA, 0x04, 0x0C, 0x01, 0xF5 };
-                    //sp_1.Write(buffer55, 0, 5);
-                    //System.Threading.Thread.Sleep(100);
-
-                    //////freq = 20
-                    //byte[] buffer3 = { 0xFA, 0x04, 0x0A, 0x14, 0xE4 };
-                    //sp_1.Write(buffer3, 0, 5);
-                    //System.Threading.Thread.Sleep(100);
-
-                    ////continuous readings
-                    //byte[] buffer = { 0x80, 0x06, 0x03, 0x77 };
-                    //sp_1.Write(buffer, 0, 4);
-                    //System.Threading.Thread.Sleep(100);
-
+                    sp_1.Open();        
                 }
+
+                //tell the unit to send text rather than binary
+                byte[] buffer7 = { 0x00, 0x11, 0x01, 0x45 };
+                sp_1.Write(buffer7, 0, 4);
+
+                m_dteStart = DateTime.Now;
+                m_dblReadingPrevious = 0;
+                m_dblReadingPrevious2 = 0;
+                m_dblVelocityPrevious = 0;
+                m_dtePrevious = DateTime.Now;
 
 
                 //postgres connection
@@ -157,75 +155,65 @@ namespace RangeFinderApp
 
                 if (!blnMeasuring) { return; }
 
+                double dblSampleRate = double.Parse(txtSampleRate.Text);
+                double dblMinRange = double.Parse(txtMinRange.Text);
+                double dblMaxRange = double.Parse(txtMaxRange.Text);
+                double dblMaxSeparation = double.Parse(txtMaxSeparation.Text);
+
+                SerialPort sp = (SerialPort)sender;
+                string strData = sp.ReadExisting();
 
                 DateTime dteNow = DateTime.Now;
                 TimeSpan ts = dteNow.Subtract(m_dteStart);
 
-                double dblSampleRate = double.Parse(txtSampleRate.Text);
-                double dblMinRange = double.Parse(txtMinRange.Text);
-                double dblMaxRange = double.Parse(txtMaxRange.Text);
-                  
-                SerialPort sp = (SerialPort)sender;
-                string strData = sp.ReadExisting();
-                
-                double dblReading;
-                if (double.TryParse(strData, out dblReading))
+                double dblReadingThis;
+                if (double.TryParse(strData, out dblReadingThis))
                 {
 
-                    if (dblReading >= (dblMinRange*1000) && dblReading <= (dblMaxRange*1000))
+                    if (dblReadingThis >= (dblMinRange*1000) && dblReadingThis <= (dblMaxRange*1000))
                     {
 
-                        SetControlText(lblRange, strData);
-
-                        if (ts.Milliseconds > dblSampleRate)
+                        double dblDistDiff2 = m_dblReadingPrevious2 - dblReadingThis;
+                        if (dblDistDiff2 <= dblMaxSeparation)
                         {
+                           
+                            SetControlText(lblRange, strData);
 
-                            //do the insert into the postgres realtime table here
-                            string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
-                            RealtimeInsertIntoDT(strTime, dblReading);
+                            if (ts.Milliseconds > dblSampleRate)
+                            {
+                                //calc velocity and accel.
+
+                                DateTime dteThis = DateTime.Now;
+
+                                double dblDistDiff = (m_dblReadingPrevious - dblReadingThis) / 1000; //m
+                                double dblTimeDiff = dteThis.Subtract(m_dtePrevious).Seconds;
+                                double dblVelocityThis = dblDistDiff / dblTimeDiff; //m/s
+                                double dblVelocityDiff = m_dblVelocityPrevious - dblVelocityThis;
+                                double dblAccelThis = dblVelocityDiff / dblTimeDiff;
+
+                                //do the insert into the postgres realtime table here
+                                string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
+                                RealtimeInsertIntoDT(strTime, dblReadingThis, dblVelocityThis, dblAccelThis);
 
 
-                            m_dteStart = DateTime.Now;
+                                m_dteStart = DateTime.Now;
+                                m_dblReadingPrevious = dblReadingThis;
+                                m_dblVelocityPrevious = dblVelocityThis;
+                                m_dtePrevious = dteThis;
+                            }
                         }
+                        m_dblReadingPrevious2 = dblReadingThis;
                     }
                 }
                 sp.DiscardOutBuffer();
                 
-
-                //string[] parts = strData.Split('?'); //? -? 000.442 ?
-                //string strDist = parts[2].Trim();
-                //SetRTBText(rtb, strDist);
-                //if (double.TryParse(strDist, out double dblDist))
-                //{
-                //    SetControlText(lblRange, dblDist.ToString());
-
-                //    string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
-
-                //    if (double.TryParse(txtMaxRange.Text, out double dblMaxRange))
-                //    {
-                //        if (dblDist <= dblMaxRange)
-                //        {
-                //            //do the insert into the postgres realtime table here
-                //            RealtimeInsertIntoDT(strTime, dblDist);
-                //        }
-                //    }
-
-                //}
-
-                //System.Threading.Thread.Sleep(100);
-                //byte[] buffer = { 0xFA, 0x06, 0x06, 0xFA };
-                //sp_1.Write(buffer, 0, 4);
-                //byte[] buffer2 = { 0x80, 0x06, 0x07, 0x73 };
-                //sp_1.Write(buffer2, 0, 4);
-
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
             }
         }
-        private void RealtimeInsertIntoDT(string strTime, double dblDist)
+        private void RealtimeInsertIntoDT(string strTime, double dblDist, double dblVelocityThis, double dblAccelThis)
         {
             try
             {
@@ -238,6 +226,15 @@ namespace RangeFinderApp
                 commPG.ExecuteNonQuery();
                 commPG.Dispose();
 
+                //strSQL = "insert into dt_ts_rangefindersensor (time,range_m_dq, range_m,net_velocity,net_acceleration)" + " values (" + strTime + ",1," + dblDist.ToString() + "," + dblVelocityThis.ToString() + "," + dblAccelThis.ToString() + ") ON CONFLICT DO NOTHING";
+                //commPG = new NpgsqlCommand(strSQL, m_connPG);
+                //commPG.ExecuteNonQuery();
+                //commPG.Dispose();
+
+                //strSQL = "insert into dt_ts_master (time)" + " values (" + strTime + ") ON CONFLICT DO NOTHING";
+                //commPG = new NpgsqlCommand(strSQL, m_connPG);
+                //commPG.ExecuteNonQuery();
+                //commPG.Dispose();
             }
             catch (Exception ex)
             {
@@ -285,25 +282,6 @@ namespace RangeFinderApp
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            try
-            {
-
-
-                //continuous readings
-                byte[] buffer = { 0xFA, 0x04, 0x05, 0x01 };
-                sp_1.Write(buffer, 0, 4);
-                System.Threading.Thread.Sleep(100);
-
-
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-        }
     }
 }
 

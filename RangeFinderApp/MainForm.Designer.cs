@@ -43,6 +43,8 @@
             this.txtSampleRate = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.txtMinRange = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtMaxSeparation = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,11 +81,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(51, 331);
+            this.label1.Location = new System.Drawing.Point(92, 328);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(206, 20);
+            this.label1.Size = new System.Drawing.Size(168, 20);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Maximum range to store (m)";
+            this.label1.Text = "Max range to store (m)";
             // 
             // btnGo
             // 
@@ -167,11 +169,11 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(51, 362);
+            this.label5.Location = new System.Drawing.Point(92, 362);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(202, 20);
+            this.label5.Size = new System.Drawing.Size(164, 20);
             this.label5.TabIndex = 20;
-            this.label5.Text = "Minimum range to store (m)";
+            this.label5.Text = "Min range to store (m)";
             // 
             // txtMinRange
             // 
@@ -182,11 +184,31 @@
             this.txtMinRange.Text = "0.5";
             this.txtMinRange.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(112, 394);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(144, 20);
+            this.label6.TabIndex = 22;
+            this.label6.Text = "Max separation (m)";
+            // 
+            // txtMaxSeparation
+            // 
+            this.txtMaxSeparation.Location = new System.Drawing.Point(266, 391);
+            this.txtMaxSeparation.Name = "txtMaxSeparation";
+            this.txtMaxSeparation.Size = new System.Drawing.Size(46, 26);
+            this.txtMaxSeparation.TabIndex = 21;
+            this.txtMaxSeparation.Text = "0.2";
+            this.txtMaxSeparation.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(640, 646);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.txtMaxSeparation);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.txtMinRange);
             this.Controls.Add(this.label4);
@@ -229,6 +251,8 @@
         private System.Windows.Forms.TextBox txtSampleRate;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtMinRange;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtMaxSeparation;
     }
 }
 
