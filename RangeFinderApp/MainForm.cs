@@ -46,6 +46,7 @@ namespace RangeFinderApp
                 txtMinRange.Text = Properties.Settings.Default.MinRange;
                 txtMaxRange.Text = Properties.Settings.Default.MaxRange;
                 txtMaxSeparation.Text = Properties.Settings.Default.MaxSeparation;
+                txtRunNum.Text = Properties.Settings.Default.RunNum;
 
             }
             catch (Exception ex)
@@ -64,6 +65,7 @@ namespace RangeFinderApp
                 Properties.Settings.Default.MinRange = txtMinRange.Text;
                 Properties.Settings.Default.MaxRange = txtMaxRange.Text;
                 Properties.Settings.Default.MaxSeparation = txtMaxSeparation.Text;
+                Properties.Settings.Default.RunNum = txtRunNum.Text;
                 Properties.Settings.Default.Save();
 
                 if (sp_1 != null)
@@ -104,14 +106,18 @@ namespace RangeFinderApp
                     sp_1.DataReceived += new SerialDataReceivedEventHandler(sp_1_DataReceived);
                     //sp_1.ErrorReceived += new SerialErrorReceivedEventHandler(sp_1_ErrorReceived);
 
-                    sp_1.Open();        
+                    sp_1.Open();
+
+                    //tell the unit to send text rather than binary
+                    byte[] buffer7 = { 0x00, 0x11, 0x01, 0x45 };
+                    sp_1.Write(buffer7, 0, 4);
+
+                    m_dteStart = DateTime.Now;
                 }
 
-                //tell the unit to send text rather than binary
-                byte[] buffer7 = { 0x00, 0x11, 0x01, 0x45 };
-                sp_1.Write(buffer7, 0, 4);
+                sp_1.DiscardInBuffer();
 
-                m_dteStart = DateTime.Now;
+                
                 m_dblReadingPrevious = 0;
                 m_dblReadingPrevious2 = 0;
                 m_dblVelocityPrevious = 0;
@@ -155,6 +161,9 @@ namespace RangeFinderApp
 
                 if (!blnMeasuring) { return; }
 
+                DateTime dteNow = DateTime.Now;
+                TimeSpan ts = dteNow.Subtract(m_dteStart);
+
                 double dblSampleRate = double.Parse(txtSampleRate.Text);
                 double dblMinRange = double.Parse(txtMinRange.Text);
                 double dblMaxRange = double.Parse(txtMaxRange.Text);
@@ -163,9 +172,6 @@ namespace RangeFinderApp
                 SerialPort sp = (SerialPort)sender;
                 string strData = sp.ReadExisting();
 
-                DateTime dteNow = DateTime.Now;
-                TimeSpan ts = dteNow.Subtract(m_dteStart);
-
                 double dblReadingThis;
                 if (double.TryParse(strData, out dblReadingThis))
                 {
@@ -173,36 +179,41 @@ namespace RangeFinderApp
                     if (dblReadingThis >= (dblMinRange*1000) && dblReadingThis <= (dblMaxRange*1000))
                     {
 
-                        double dblDistDiff2 = m_dblReadingPrevious2 - dblReadingThis;
-                        if (dblDistDiff2 <= dblMaxSeparation)
-                        {
+                        //double dblDistDiff2 = Math.Abs(m_dblReadingPrevious2 - dblReadingThis);
+                        //if (dblDistDiff2 <= (dblMaxSeparation*1000))
+                        //{
                            
-                            SetControlText(lblRange, strData);
+                            
 
                             if (ts.Milliseconds > dblSampleRate)
                             {
-                                //calc velocity and accel.
+                            //calc velocity and accel.
 
-                                DateTime dteThis = DateTime.Now;
+                            SetControlText(lblRange, strData);
 
-                                double dblDistDiff = (m_dblReadingPrevious - dblReadingThis) / 1000; //m
-                                double dblTimeDiff = dteThis.Subtract(m_dtePrevious).Seconds;
-                                double dblVelocityThis = dblDistDiff / dblTimeDiff; //m/s
-                                double dblVelocityDiff = m_dblVelocityPrevious - dblVelocityThis;
-                                double dblAccelThis = dblVelocityDiff / dblTimeDiff;
+                            DateTime dteThis = DateTime.Now;
 
-                                //do the insert into the postgres realtime table here
-                                string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
-                                RealtimeInsertIntoDT(strTime, dblReadingThis, dblVelocityThis, dblAccelThis);
+                            double dblDistDiff = (m_dblReadingPrevious - dblReadingThis) / 1000; //m
+                            double dblTimeDiff = dteThis.Subtract(m_dtePrevious).TotalSeconds;
+                            double dblVelocityThis = dblDistDiff / dblTimeDiff; //m/s
+                            double dblVelocityDiff = m_dblVelocityPrevious - dblVelocityThis;
+                            double dblAccelThis = dblVelocityDiff / dblTimeDiff;
+
+                            //SetControlText(lblVelocity, Math.Round(dblVelocityThis,2).ToString() + "m/s");
+                            //SetControlText(lblAcceleration, Math.Round(dblAccelThis, 2).ToString() + "m/s^2");
+
+                            //do the insert into the postgres realtime table here
+                            string strTime = "'" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.f") + "'";
+                            RealtimeInsertIntoDT(strTime, dblReadingThis, dblVelocityThis, dblAccelThis);
 
 
-                                m_dteStart = DateTime.Now;
-                                m_dblReadingPrevious = dblReadingThis;
-                                m_dblVelocityPrevious = dblVelocityThis;
-                                m_dtePrevious = dteThis;
-                            }
+                            m_dteStart = DateTime.Now;
+                            m_dblReadingPrevious = dblReadingThis;
+                            m_dblVelocityPrevious = dblVelocityThis;
+                            m_dtePrevious = dteThis;
                         }
-                        m_dblReadingPrevious2 = dblReadingThis;
+                        //}
+                        //m_dblReadingPrevious2 = dblReadingThis;
                     }
                 }
                 sp.DiscardOutBuffer();
@@ -220,7 +231,9 @@ namespace RangeFinderApp
 
                 if (m_connPG == null) { return; }
 
-                string strSQL = "insert into dt_ts_realtime_data (time,data_channel,range_m)" + " values (" + strTime + ",3,"+ dblDist.ToString() + ") ON CONFLICT DO NOTHING";
+                int intRunNum = int.Parse(txtRunNum.Text);
+
+                string strSQL = "insert into dt_ts_realtime_data (time,data_channel,range_m,run_number)" + " values (" + strTime + ",3,"+ dblDist.ToString() + "," + intRunNum.ToString() + ") ON CONFLICT DO NOTHING";
 
                 NpgsqlCommand commPG = new NpgsqlCommand(strSQL, m_connPG);
                 commPG.ExecuteNonQuery();
@@ -282,6 +295,24 @@ namespace RangeFinderApp
             }
         }
 
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                int intNextRunNum = int.Parse(txtRunNum.Text) + 1;
+                txtRunNum.Text = intNextRunNum.ToString();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void txtPort_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
 
